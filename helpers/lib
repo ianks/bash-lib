@@ -3,7 +3,7 @@
 : "${BASH_LIB_DIR:?BASH_LIB_DIR must be set. Please source bash-lib/init before other scripts from bash-lib.}"
 
 function die(){
-    echo "${@}"
+    echo "${@}" 1>&2
     exit 1
 }
 
@@ -33,7 +33,7 @@ function retry {
     local -r MAX_BACKOFF=30
 
     if [[ ${#} -lt 2 ]]; then
-        echo "retry usage: retry <retries> <command>"
+        echo "retry usage: retry <retries> <command>" 1>&2
         exit 1
     fi
 
@@ -41,7 +41,7 @@ function retry {
     shift
 
     if ! [[ ${retries} =~ ^[0-9\.]*$ ]]; then
-        echo "Invalid number of retries: ${retries} for command '${*}'".
+        echo "Invalid number of retries: ${retries} for command '${*}'". 1>&2
         exit 1
     fi
 
@@ -62,11 +62,11 @@ function retry {
             # Add a random amount to the delay to prevent competing processes
             # from re-colliding.
             wait=$(( backoff + (RANDOM % count) ))
-            echo "'${*}' Retry $count/$retries exited $exit, retrying in $wait seconds..."
+            echo "'${*}' Retry $count/$retries exited $exit, retrying in $wait seconds..." 1>&2 
             sleep $wait
         else
             # Out of retries :(
-            echo "Retry $count/$retries exited $exit, no more retries left."
+            echo "Retry $count/$retries exited $exit, no more retries left." 1>&2
             return $exit
         fi
     done
